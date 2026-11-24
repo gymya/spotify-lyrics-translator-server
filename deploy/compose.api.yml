@@ -1,0 +1,36 @@
+name: lyrics-api
+services:
+  api:
+    image: ${API_IMAGE:?Set API_IMAGE to a versioned image}
+    environment:
+      API_BIND: 0.0.0.0:3000
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+      SUPABASE_URL: ${SUPABASE_URL:?Set SUPABASE_URL}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-translategemma:4b}
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    stop_grace_period: 30s
+    logging:
+      driver: local
+      options: {max-size: "10m", max-file: "3"}
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?Set API_DOMAIN to your DNS hostname}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+    logging:
+      driver: local
+      options: {max-size: "10m", max-file: "3"}
+volumes:
+  caddy_data:
+  caddy_config:

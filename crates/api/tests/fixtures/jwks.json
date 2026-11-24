@@ -1,0 +1,21 @@
+{
+  "keys": [
+    {
+      "kty": "EC",
+      "crv": "P-256",
+      "alg": "ES256",
+      "use": "sig",
+      "kid": "ec-test",
+      "x": "kFFH0NtVGQlHIYCFGwzXitHtNk-t1MNJBXLq8oW2Q4g",
+      "y": "bm3ETeTr6Q8mQMKOFPtbFCmUI87itYQE3Bh2-rm8SgU"
+    },
+    {
+      "kty": "RSA",
+      "alg": "RS256",
+      "use": "sig",
+      "kid": "rsa-test",
+      "n": "zIwEP2TMK1lPDxjafu4GnVRSmiInpwy4NBY0qtSlq0y06JHfKzw_0Nu4y-_9oINNuKBMnteXBJAoHiukkcIvy3QAe4XXA7tfaBqCQT1JrmTdIgcfyDZQFP4a5jOJbuAXdp5dJspv8B8LYnp-kwuCsUqS5SEQrrN_e9X0EG9y8VIyjbPCWXu5J7sx0BCU54MTDU7nP5F6MV7WHARtxypBRyQ7T8CATYFf7-2G6UlTHgJaD_Jj0Ca45QQNMlrG7dK7XDzJLHbS0m_UNljyBdpVYR1WP1ZVGs9ZGTsdsAo1j2yfBp4-ROs0MkJ7Pv4yqPUvdoT4_GRFL0CykBTomDC9Zw",
+      "e": "AQAB"
+    }
+  ]
+}

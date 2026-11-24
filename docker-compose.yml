@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-translator}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-only}
+      POSTGRES_DB: ${POSTGRES_DB:-translator}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api:
+    profiles: [app]
+    image: lyrics-api:local
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      API_BIND: 0.0.0.0:3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-translator}:${POSTGRES_PASSWORD:-local-development-only}@postgres:5432/${POSTGRES_DB:-translator}
+      SUPABASE_URL: ${SUPABASE_URL:-https://your-project-ref.supabase.co}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-translategemma:4b}
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    stop_grace_period: 30s
+  worker:
+    profiles: [app]
+    image: lyrics-worker:local
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-translator}:${POSTGRES_PASSWORD:-local-development-only}@postgres:5432/${POSTGRES_DB:-translator}
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-translategemma:4b}
+      OLLAMA_TIMEOUT_SECONDS: ${OLLAMA_TIMEOUT_SECONDS:-180}
+      OLLAMA_MAX_ATTEMPTS: ${OLLAMA_MAX_ATTEMPTS:-3}
+    depends_on:
+      postgres: {condition: service_healthy}
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    stop_grace_period: 30s
+volumes:
+  postgres_data:
